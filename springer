@@ -1,0 +1,35 @@
+#!/usr/bin/env zsh
+
+set -euo pipefail
+setopt +o nomatch
+trap -- 'echo "FAIL: ${pipestatus[@]}"' "ERR"
+declare dir="$( dirname "${0}" )"
+
+# Interactive password entry
+while [ ! "${password-1}" = "${password_confirm-2}" ]; do
+  printf  '%s: '    "Create a password for user ${adm_user}"
+  read    -s        password
+  printf  '\n%s: '  'Retype the password'
+  read    -s        password_confirm
+  print   '\n'
+done
+unset password_confirm
+
+set -x
+
+# NTP
+timedatectl set-ntp true
+
+# Check SSH connection for adm_net
+: ${adm_net:=$( ss  --no-header                                     \
+                    --options state established '( sport = :ssh )'  |
+                awk '{print $5}'                                    |
+                sed --expression 's|[0-9]*:.*|0/24|;q'                )}
+
+# Check reverse dns for hostname
+: ${hostname:=$(  dig -x "$( hostname -i )" +noall +answer            |
+                  awk '/\.$/ { print substr($NF, 1, length($NF)-1) }'   )}
+
+for conf in "${dir}/conf.d"*; do
+  source "${conf}"
+done

@@ -1,0 +1,22 @@
+#!/usr/bin/env zsh
+
+mount                                               |
+grep  --quiet '/mnt'                                ||
+{ declare home='/dev/sdc'                           &&
+  cryptsetup  open  /dev/md/*root_mirror            \
+                    'root_luks'                     &&
+  sleep '1'                                         &&
+  lvscan  --all                                     &&
+  mount '/dev/root_vg/root_lv'    '/mnt'            &&
+  mount '/dev/root_vg/var_lv'     '/mnt/var'        &&
+  mount '/dev/root_vg/var_log_lv' '/mnt/var/log'    &&
+  cryptsetup  open  --key-file '/mnt/etc/luks.key'  \
+                    '/dev/md/'*'boot_mirror'        \
+                    'boot_luks'                     &&
+  cryptsetup  open  --key-file '/mnt/etc/luks.key'  \
+                    "${home}1"                      \
+                    'home_luks'                     &&
+  lvscan  --all                                     &&
+  mount '/dev/boot_vg/boot_lv'  '/mnt/boot'         &&
+  mount '/dev/home_vg/home_lv'  '/mnt/home'
+}
