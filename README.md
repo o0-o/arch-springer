@@ -1,7 +1,7 @@
 # Springer
 Modular Arch Linux Installation Scripts
 
-Less famous than the keystone, [springer](https://en.wikipedia.org/wiki/Springer_(architecture) refers to the stones that begin an arch.
+Less famous than the keystone, [springer](https://en.wikipedia.org/wiki/Springer_\(architecture\)) refers to the stones that begin an arch.
 
 ## Fair Warning
 The `00-erase.zsh` script will aggressively destroy data with no warning or prompt. It is intended for use on a system where all filesystems, partitions, etc need to be erased to prepare for the Arch installation.
